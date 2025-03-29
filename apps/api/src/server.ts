@@ -1,10 +1,4 @@
-import fastify from 'fastify'
-
-const app = fastify()
-
-app.get('/', () => {
-  return 'hello world'
-})
+import { app } from './app.ts'
 
 app.listen({
   port: 3333,
