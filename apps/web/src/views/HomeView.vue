@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '@/components/TheWelcome.vue'
+import StreamPlayer from '@/components/StreamPlayer.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <StreamPlayer />
   </main>
 </template>
