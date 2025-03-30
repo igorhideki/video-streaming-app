@@ -2,9 +2,12 @@
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { Play, Pause } from 'lucide-vue-next'
 
+const { videoSource } = defineProps({
+  videoSource: String,
+})
+
 const videoRef = useTemplateRef('videoRef')
 const isVideoPlaying = ref(false)
-const videoSource = 'http://localhost:3333/video'
 const progress = ref(0)
 
 onMounted(() => {
@@ -66,10 +69,12 @@ function updateProgress(e: Event) {
 </script>
 
 <template>
-  <video ref="videoRef" class="block w-full rounded-t-md">
-    <source :src="videoSource" type="video/mp4" />
-    Your browser doesn't support HTML video.
-  </video>
+  <div class="relative">
+    <video ref="videoRef" class="block w-full rounded-t-md bg-black">
+      <source :src="videoSource" type="video/mp4" />
+      Your browser doesn't support HTML video.
+    </video>
+  </div>
   <div
     class="flex items-center justify-center gap-2 rounded-b-sm bg-neutral-950 p-2 text-neutral-50"
   >
