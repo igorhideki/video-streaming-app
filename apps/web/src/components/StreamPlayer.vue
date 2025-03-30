@@ -9,6 +9,7 @@ const { videoSource } = defineProps({
 const videoRef = useTemplateRef('videoRef')
 const isVideoPlaying = ref(false)
 const progress = ref(0)
+const hasError = ref(false)
 
 onMounted(() => {
   const video = videoRef.value
@@ -41,6 +42,8 @@ function handlePause() {
 function togglePlay() {
   const video = videoRef.value
 
+  hasError.value = false
+
   if (!video) return
 
   if (isVideoPlaying.value) {
@@ -66,11 +69,23 @@ function updateProgress(e: Event) {
   const target = e.target as HTMLInputElement
   video.currentTime = (Number(target.value) / 10000) * video.duration
 }
+
+function handleError(e: Event) {
+  hasError.value = true
+
+  console.log('An error occour while video was loading ', e.target)
+}
 </script>
 
 <template>
   <div class="relative">
-    <video ref="videoRef" class="block w-full rounded-t-md bg-black">
+    <video
+      ref="videoRef"
+      class="block w-full rounded-t-md bg-black"
+      @error="handleError"
+      @waiting="handleError"
+      @stalled="handleError"
+    >
       <source :src="videoSource" type="video/mp4" />
       Your browser doesn't support HTML video.
     </video>
@@ -91,5 +106,5 @@ function updateProgress(e: Event) {
       @input="updateProgress"
     />
   </div>
-  <p>{{ progress }}</p>
+  <p v-if="hasError" class="mt-4 text-red-800">Failed to load video. Please try again.</p>
 </template>
