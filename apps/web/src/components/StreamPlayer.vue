@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { Play, Pause, Pencil, PencilOff, Eraser, Pointer, PointerOff } from 'lucide-vue-next'
+import StreamPlayerButton from './StreamPlayerButton.vue'
 
-const { videoSource } = defineProps({
-  videoSource: String,
-})
+const { videoSource } = defineProps<{
+  videoSource: string
+}>()
 
 const videoRef = useTemplateRef('videoRef')
 const canvasRef = useTemplateRef('canvasRef')
 const isVideoPlaying = ref(false)
 const progress = ref(0)
-const hasError = ref(false)
 const isDrawing = ref(false)
 const isDrawingActive = ref(false)
 const isPointerActive = ref(false)
@@ -18,35 +18,18 @@ const isPointerActive = ref(false)
 let ctx: CanvasRenderingContext2D | null = null
 
 onMounted(() => {
-  const video = videoRef.value
-
-  if (!video) return
-
-  video.addEventListener('play', handlePlay)
-  video.addEventListener('pause', handlePause)
-  video.addEventListener('timeupdate', handleProgress)
-
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  video.addEventListener('loadedmetadata', setupCanvas)
+  setupCanvas()
+  window.addEventListener('resize', updateCanvasSize)
+  videoRef.value?.addEventListener('play', handlePlay)
+  videoRef.value?.addEventListener('pause', handlePause)
+  videoRef.value?.addEventListener('timeupdate', handleProgress)
 })
 
 onUnmounted(() => {
-  const video = videoRef.value
-
-  if (!video) return
-
-  video.removeEventListener('play', handlePlay)
-  video.removeEventListener('pause', handlePause)
-  video.removeEventListener('timeupdate', handleProgress)
-
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  video.removeEventListener('loadedmetadata', setupCanvas)
+  window.removeEventListener('resize', updateCanvasSize)
+  videoRef.value?.removeEventListener('play', handlePlay)
+  videoRef.value?.removeEventListener('pause', handlePause)
+  videoRef.value?.removeEventListener('timeupdate', handleProgress)
 })
 
 function handlePlay() {
@@ -58,46 +41,29 @@ function handlePause() {
 }
 
 function togglePlay() {
-  const video = videoRef.value
-
-  hasError.value = false
-
-  if (!video) return
-
-  if (isVideoPlaying.value) {
-    video.pause()
-  } else {
-    video.play()
-  }
+  isVideoPlaying.value ? videoRef.value?.pause() : videoRef.value?.play()
 }
 
 function handleProgress() {
-  const video = videoRef.value
+  if (!videoRef.value) return
 
-  if (!video) return
-
-  progress.value = (video.currentTime / video.duration) * 10000
+  progress.value = (videoRef.value.currentTime / videoRef.value.duration) * 10000
 }
 
 function updateProgress(event: Event) {
-  const video = videoRef.value
-
-  if (!video) return
+  if (!videoRef.value) return
 
   const target = event.target as HTMLInputElement
-  video.currentTime = (Number(target.value) / 10000) * video.duration
+
+  videoRef.value.currentTime = (Number(target.value) / 10000) * videoRef.value.duration
 }
 
 function setupCanvas() {
-  const video = videoRef.value
-  const canvas = canvasRef.value
+  if (!videoRef.value || !canvasRef.value) return
 
-  if (!video || !canvas) return
-
-  canvas.width = video.clientWidth
-  canvas.height = video.clientHeight
-
-  ctx = canvas.getContext('2d')
+  canvasRef.value.width = videoRef.value.clientWidth
+  canvasRef.value.height = videoRef.value.clientHeight
+  ctx = canvasRef.value.getContext('2d')
 }
 
 function startDrawing(event: MouseEvent) {
@@ -122,19 +88,15 @@ function stopDrawing() {
 }
 
 function clearCanvas() {
-  const canvas = canvasRef.value
-  if (!ctx || !canvas) return
+  if (!ctx || !canvasRef.value) return
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
 }
 
 function pointer(event: MouseEvent) {
-  const canvas = canvasRef.value
+  if (!ctx || !canvasRef.value) return
 
-  if (!ctx || !canvas) return
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-
+  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
   ctx.beginPath()
   ctx.arc(event.offsetX, event.offsetY, 16, 0, Math.PI * 2)
 
@@ -146,9 +108,9 @@ function pointer(event: MouseEvent) {
     event.offsetY,
     16,
   )
+
   gradient.addColorStop(0, 'rgba(255, 0, 0, 1)')
   gradient.addColorStop(1, 'rgba(255, 0, 0, 0)')
-
   ctx.fillStyle = gradient
   ctx.fill()
 }
@@ -170,42 +132,33 @@ function togglePointer() {
 }
 
 function addDrawingSetup() {
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  canvas.addEventListener('mousedown', startDrawing)
-  canvas.addEventListener('mouseup', stopDrawing)
-  canvas.addEventListener('mousemove', draw)
-  canvas.addEventListener('mouseleave', stopDrawing)
+  canvasRef.value?.addEventListener('mousedown', startDrawing)
+  canvasRef.value?.addEventListener('mouseup', stopDrawing)
+  canvasRef.value?.addEventListener('mousemove', draw)
+  canvasRef.value?.addEventListener('mouseleave', stopDrawing)
 }
 
 function removeDrawingSetup() {
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  canvas.removeEventListener('mousedown', startDrawing)
-  canvas.removeEventListener('mouseup', stopDrawing)
-  canvas.removeEventListener('mousemove', draw)
-  canvas.removeEventListener('mouseleave', stopDrawing)
+  canvasRef.value?.removeEventListener('mousedown', startDrawing)
+  canvasRef.value?.removeEventListener('mouseup', stopDrawing)
+  canvasRef.value?.removeEventListener('mousemove', draw)
+  canvasRef.value?.removeEventListener('mouseleave', stopDrawing)
 }
 
 function addPointerSetup() {
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  canvas.addEventListener('mousemove', pointer)
+  canvasRef.value?.addEventListener('mousemove', pointer)
 }
 
 function removePointerSetup() {
-  const canvas = canvasRef.value
-
-  if (!canvas) return
-
-  canvas.removeEventListener('mousemove', pointer)
+  canvasRef.value?.removeEventListener('mousemove', pointer)
   clearCanvas()
+}
+
+function updateCanvasSize() {
+  if (!canvasRef.value) return
+
+  canvasRef.value.width = videoRef.value?.clientWidth ?? 0
+  canvasRef.value.height = videoRef.value?.clientHeight ?? 0
 }
 </script>
 
@@ -218,17 +171,19 @@ function removePointerSetup() {
 
     <canvas
       ref="canvasRef"
-      :class="{ 'cursor-crosshair': isDrawingActive, 'cursor-none': isPointerActive }"
       class="absolute top-0 left-0 h-full w-full rounded-t-md"
+      :class="{ 'cursor-crosshair': isDrawingActive, 'cursor-none': isPointerActive }"
     ></canvas>
   </div>
   <div
     class="flex items-center justify-center gap-2 rounded-b-sm bg-neutral-950 p-2 text-neutral-50"
   >
-    <button @click="togglePlay" class="rounded-md px-2 py-1 text-neutral-50 hover:bg-neutral-900">
-      <Pause v-if="isVideoPlaying" stroke-width="2" :size="24" />
-      <Play v-else stroke-width="2" :size="24" />
-    </button>
+    <StreamPlayerButton
+      @click="togglePlay"
+      :icon="isVideoPlaying ? Pause : Play"
+      :isActive="isVideoPlaying"
+    />
+
     <input
       type="range"
       min="0"
@@ -237,22 +192,19 @@ function removePointerSetup() {
       class="mx-4 w-full accent-white"
       @input="updateProgress"
     />
-    <button
+
+    <StreamPlayerButton
       @click="toggleDrawing"
-      class="rounded-md px-2 py-1 text-neutral-50 hover:bg-neutral-900"
-    >
-      <PencilOff v-if="isDrawingActive" stroke-width="2" :size="24" />
-      <Pencil v-else stroke-width="2" :size="24" />
-    </button>
-    <button
+      :icon="isDrawingActive ? PencilOff : Pencil"
+      :isActive="isDrawingActive"
+    />
+
+    <StreamPlayerButton
       @click="togglePointer"
-      class="rounded-md px-2 py-1 text-neutral-50 hover:bg-neutral-900"
-    >
-      <PointerOff v-if="isPointerActive" stroke-width="2" :size="24" />
-      <Pointer v-else stroke-width="2" :size="24" />
-    </button>
-    <button @click="clearCanvas" class="rounded-md px-2 py-1 text-neutral-50 hover:bg-neutral-900">
-      <Eraser stroke-width="2" :size="24" />
-    </button>
+      :icon="isPointerActive ? PointerOff : Pointer"
+      :isActive="isPointerActive"
+    />
+
+    <StreamPlayerButton @click="clearCanvas" :icon="Eraser" />
   </div>
 </template>
