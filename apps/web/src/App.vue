@@ -13,6 +13,7 @@ onMounted(() => {
 
 function toggleTheme() {
   isDarkMode.value = !isDarkMode.value
+  localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light')
 
   updateTheme()
 }
@@ -25,8 +26,10 @@ function updateTheme() {
 </script>
 
 <template>
-  <div class="h-screen bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-300">
-    <div class="mx-auto max-w-3xl p-4">
+  <div
+    class="h-screen bg-neutral-200 text-neutral-900 duration-500 ease-in-out dark:bg-neutral-800 dark:text-neutral-300"
+  >
+    <div class="mx-auto max-w-4xl p-4">
       <header class="mb-4">
         <nav class="flex justify-between py-4 font-bold">
           <div class="flex gap-4">
