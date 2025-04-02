@@ -18,11 +18,12 @@ const isPointerActive = ref(false)
 let ctx: CanvasRenderingContext2D | null = null
 
 onMounted(() => {
-  setupCanvas()
   window.addEventListener('resize', updateCanvasSize)
+
   videoRef.value?.addEventListener('play', handlePlay)
   videoRef.value?.addEventListener('pause', handlePause)
   videoRef.value?.addEventListener('timeupdate', handleProgress)
+  videoRef.value?.addEventListener('loadedmetadata', setupCanvas)
 })
 
 onUnmounted(() => {
@@ -30,6 +31,7 @@ onUnmounted(() => {
   videoRef.value?.removeEventListener('play', handlePlay)
   videoRef.value?.removeEventListener('pause', handlePause)
   videoRef.value?.removeEventListener('timeupdate', handleProgress)
+  videoRef.value?.removeEventListener('loadedmetadata', setupCanvas)
 })
 
 function handlePlay() {
@@ -66,6 +68,13 @@ function setupCanvas() {
   ctx = canvasRef.value.getContext('2d')
 }
 
+function updateCanvasSize() {
+  if (!canvasRef.value) return
+
+  canvasRef.value.width = videoRef.value?.clientWidth ?? 0
+  canvasRef.value.height = videoRef.value?.clientHeight ?? 0
+}
+
 function startDrawing(event: MouseEvent) {
   if (!ctx) return
 
@@ -87,13 +96,37 @@ function stopDrawing() {
   isDrawing.value = false
 }
 
-function clearCanvas() {
-  if (!ctx || !canvasRef.value) return
+function toggleDrawing() {
+  isDrawingActive.value = !isDrawingActive.value
+  isPointerActive.value = false
+  removePointerSetup()
 
-  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+  isDrawingActive.value ? addDrawingSetup() : removeDrawingSetup()
 }
 
-function pointer(event: MouseEvent) {
+function addDrawingSetup() {
+  canvasRef.value?.addEventListener('mousedown', startDrawing)
+  canvasRef.value?.addEventListener('mouseup', stopDrawing)
+  canvasRef.value?.addEventListener('mousemove', draw)
+  canvasRef.value?.addEventListener('mouseleave', stopDrawing)
+}
+
+function removeDrawingSetup() {
+  canvasRef.value?.removeEventListener('mousedown', startDrawing)
+  canvasRef.value?.removeEventListener('mouseup', stopDrawing)
+  canvasRef.value?.removeEventListener('mousemove', draw)
+  canvasRef.value?.removeEventListener('mouseleave', stopDrawing)
+}
+
+function togglePointer() {
+  isPointerActive.value = !isPointerActive.value
+  isDrawingActive.value = false
+  removeDrawingSetup()
+
+  isPointerActive.value ? addPointerSetup() : removePointerSetup()
+}
+
+function showPointer(event: MouseEvent) {
   if (!ctx || !canvasRef.value) return
 
   ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
@@ -115,50 +148,19 @@ function pointer(event: MouseEvent) {
   ctx.fill()
 }
 
-function toggleDrawing() {
-  isDrawingActive.value = !isDrawingActive.value
-  isPointerActive.value = false
-  removePointerSetup()
-
-  isDrawingActive.value ? addDrawingSetup() : removeDrawingSetup()
-}
-
-function togglePointer() {
-  isPointerActive.value = !isPointerActive.value
-  isDrawingActive.value = false
-  removeDrawingSetup()
-
-  isPointerActive.value ? addPointerSetup() : removePointerSetup()
-}
-
-function addDrawingSetup() {
-  canvasRef.value?.addEventListener('mousedown', startDrawing)
-  canvasRef.value?.addEventListener('mouseup', stopDrawing)
-  canvasRef.value?.addEventListener('mousemove', draw)
-  canvasRef.value?.addEventListener('mouseleave', stopDrawing)
-}
-
-function removeDrawingSetup() {
-  canvasRef.value?.removeEventListener('mousedown', startDrawing)
-  canvasRef.value?.removeEventListener('mouseup', stopDrawing)
-  canvasRef.value?.removeEventListener('mousemove', draw)
-  canvasRef.value?.removeEventListener('mouseleave', stopDrawing)
-}
-
 function addPointerSetup() {
-  canvasRef.value?.addEventListener('mousemove', pointer)
+  canvasRef.value?.addEventListener('mousemove', showPointer)
 }
 
 function removePointerSetup() {
-  canvasRef.value?.removeEventListener('mousemove', pointer)
+  canvasRef.value?.removeEventListener('mousemove', showPointer)
   clearCanvas()
 }
 
-function updateCanvasSize() {
-  if (!canvasRef.value) return
+function clearCanvas() {
+  if (!ctx || !canvasRef.value) return
 
-  canvasRef.value.width = videoRef.value?.clientWidth ?? 0
-  canvasRef.value.height = videoRef.value?.clientHeight ?? 0
+  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
 }
 </script>
 
@@ -176,7 +178,7 @@ function updateCanvasSize() {
     ></canvas>
   </div>
   <div
-    class="flex items-center justify-center gap-2 rounded-b-sm bg-neutral-950 p-2 text-neutral-50"
+    class="flex items-center justify-center gap-2 rounded-b-md bg-neutral-950 p-2 text-neutral-50"
   >
     <StreamPlayerButton
       @click="togglePlay"
