@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import { Sun, Moon } from 'lucide-vue-next'
+import { Sun, Moon, PlayCircle } from 'lucide-vue-next'
 
 const isDarkMode = ref(false)
 
@@ -27,20 +27,30 @@ function updateTheme() {
 
 <template>
   <div
-    class="h-screen bg-neutral-200 text-neutral-900 duration-500 ease-in-out dark:bg-neutral-800 dark:text-neutral-300"
+    class="h-screen bg-neutral-200 text-neutral-700 duration-300 ease-in-out dark:bg-neutral-900 dark:text-neutral-400"
   >
-    <div class="mx-auto max-w-4xl p-4">
+    <div class="mx-auto max-w-4xl p-2">
       <header class="mb-4">
         <nav class="flex justify-between py-4 font-bold">
-          <div class="flex gap-4">
-            <RouterLink to="/" class="hover:text-neutral-700 dark:hover:text-neutral-400"
-              >Home</RouterLink
+          <div class="flex gap-8">
+            <RouterLink to="/" class="text-green-800 duration-200 ease-in-out hover:text-green-900">
+              <div class="flex">
+                <PlayCircle />
+                <span class="pl-1">VideoStreaming</span>
+              </div>
+            </RouterLink>
+
+            <RouterLink
+              to="/about"
+              class="duration-200 ease-in-out hover:text-neutral-800 dark:hover:text-neutral-500"
             >
-            <RouterLink to="/about" class="hover:text-neutral-700 dark:hover:text-neutral-400"
-              >About</RouterLink
-            >
+              About
+            </RouterLink>
           </div>
-          <button @click="toggleTheme" class="hover:text-neutral-700 dark:hover:text-neutral-400">
+          <button
+            @click="toggleTheme"
+            class="duration-200 ease-in-out hover:text-neutral-800 dark:hover:text-neutral-500"
+          >
             <Sun v-if="isDarkMode" />
             <Moon v-else />
           </button>

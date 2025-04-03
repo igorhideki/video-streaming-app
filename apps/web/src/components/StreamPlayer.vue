@@ -188,7 +188,7 @@ function clearCanvas() {
     ></canvas>
   </div>
   <div
-    class="flex items-center justify-center gap-2 rounded-b-md bg-neutral-950 p-2 text-neutral-50"
+    class="flex items-center justify-center gap-1 rounded-b-md bg-neutral-950 p-2 text-neutral-50 sm:gap-2"
   >
     <StreamPlayerButton
       @click="togglePlay"
@@ -201,7 +201,7 @@ function clearCanvas() {
       min="0"
       max="10000"
       v-model="progress"
-      class="mx-4 w-full accent-white"
+      class="mx-1 w-full accent-white sm:mx-4"
       @input="updateProgress"
     />
 
