@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
-import { Play, Pause, Pencil, PencilOff, Eraser, Pointer, PointerOff } from 'lucide-vue-next'
+import {
+  Play,
+  Pause,
+  Pencil,
+  PencilOff,
+  Eraser,
+  Pointer,
+  PointerOff,
+  Palette,
+} from 'lucide-vue-next'
 import StreamPlayerButton from './StreamPlayerButton.vue'
 
 const { videoSource } = defineProps<{
@@ -14,6 +23,7 @@ const progress = ref(0)
 const isDrawing = ref(false)
 const isDrawingActive = ref(false)
 const isPointerActive = ref(false)
+const colorSelected = ref('green')
 
 let ctx: CanvasRenderingContext2D | null = null
 
@@ -87,7 +97,7 @@ function draw(event: MouseEvent) {
   if (!isDrawing.value || !ctx) return
 
   ctx.lineTo(event.offsetX, event.offsetY)
-  ctx.strokeStyle = 'green'
+  ctx.strokeStyle = colorSelected.value
   ctx.lineWidth = 3
   ctx.stroke()
 }
@@ -200,6 +210,21 @@ function clearCanvas() {
       :icon="isDrawingActive ? PencilOff : Pencil"
       :isActive="isDrawingActive"
     />
+
+    <label
+      for="colorSelector"
+      class="relative rounded-md px-2 py-1 text-neutral-50 hover:bg-neutral-900"
+    >
+      <Palette stroke-width="2" :size="24" />
+
+      <input
+        type="color"
+        name="colorSelector"
+        id="colorSelector"
+        class="b-0 l-0 invisible absolute h-px w-px"
+        v-model="colorSelected"
+      />
+    </label>
 
     <StreamPlayerButton
       @click="togglePointer"
