@@ -59,7 +59,7 @@ npm run dev:web
 
 #### Para iniciar a **API (Backend)**
 
-Antes de executar a API, é necessário adicionar um vídeo no formato `.mp4` na pasta `apps/api/public` para que possa ser enviado via streaming.
+**IMPORTANTE:** Antes de executar a API, é necessário adicionar um vídeo no formato `.mp4` na pasta `apps/api/public` para que possa ser enviado via streaming.
 
 ```sh
 npm run dev:api
