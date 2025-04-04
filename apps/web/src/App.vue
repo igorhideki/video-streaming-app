@@ -29,7 +29,7 @@ function updateTheme() {
   <div
     class="h-screen bg-neutral-200 text-neutral-700 duration-300 ease-in-out dark:bg-neutral-900 dark:text-neutral-400"
   >
-    <div class="mx-auto max-w-4xl p-2">
+    <div class="mx-auto max-w-4xl p-2 lg:max-w-5xl">
       <header class="mb-4">
         <nav class="flex justify-between py-4 font-bold">
           <div class="flex gap-8">
