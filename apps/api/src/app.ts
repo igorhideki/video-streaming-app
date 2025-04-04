@@ -7,6 +7,8 @@ app.get('/video', async (request, reply) => {
   const videoPath = new URL('../public/video.mp4', import.meta.url).pathname
 
   if (!fs.existsSync(videoPath)) {
+    console.error('> Error - Video not found')
+
     return reply.status(404).send('Video not found')
   }
 
@@ -21,24 +23,19 @@ app.get('/video', async (request, reply) => {
     const chunkSize = end - start + 1
     const stream = fs.createReadStream(videoPath, { start, end })
 
-    reply
-      .code(206)
-      .headers({
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunkSize,
-        'Content-Type': 'video/mp4',
-      })
+    reply.code(206).headers({
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunkSize,
+      'Content-Type': 'video/mp4',
+    })
 
     return stream
-  }
-  else {
-    reply
-      .code(200)
-      .headers({
-        'Content-Length': fileSize,
-        'Content-Type': 'video/mp4',
-      })
+  } else {
+    reply.code(200).headers({
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    })
 
     return fs.createReadStream(videoPath)
   }
