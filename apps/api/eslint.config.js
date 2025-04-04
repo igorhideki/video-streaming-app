@@ -13,5 +13,8 @@ export default defineConfig([
   plugins['@stylistic'].configs['recommended-flat'],
   {
     ignores: ['build'],
+    rules: {
+      'brace-style': 'stroustrup',
+    },
   },
 ])
