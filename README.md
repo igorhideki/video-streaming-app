@@ -33,7 +33,7 @@ O projeto web foi desenvolvido utilizando as seguintes tecnologias:
 
 ### API (backend)
 
-O backend foi desenvolvido utilizando:seram
+O backend foi desenvolvido utilizando:
 
 - NodeJs
 - Fastify
@@ -41,7 +41,9 @@ O backend foi desenvolvido utilizando:seram
 
 ## Como Executar
 
-Antes de rodar a aplicação, instale as dependências executando o seguinte comando na pasta raiz:
+Os comandos a seguir devem ser executados na pasta raiz.
+
+Instale as dependências executando:
 
 ```sh
 npm install
