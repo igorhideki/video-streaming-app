@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FunctionalComponent } from 'vue'
 
-const props = defineProps<{
+defineProps<{
   isActive?: boolean
   icon: FunctionalComponent
   onClick: () => void

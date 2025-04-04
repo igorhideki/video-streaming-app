@@ -29,6 +29,7 @@ O projeto web foi desenvolvido utilizando as seguintes tecnologias:
 - Tailwind CSS
 - TypeScript
 - Vite
+- Vitest
 
 ### API (backend)
 
@@ -71,3 +72,13 @@ npm run build
 ```
 
 Os arquivos serão salvos na pasta `/dist` de cada projeto.
+
+## Testes automatizados
+
+Este projeto utiliza **Vitest** e **Vue Test Utils** para a criação de testes automatizados.
+
+Para executar os testes, execute o seguinte comando na pasta raiz:
+
+```sh
+npm run test
+```
